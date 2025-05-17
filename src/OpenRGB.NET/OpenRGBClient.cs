@@ -8,6 +8,7 @@ namespace OpenRGB.NET;
 /// </summary>
 public sealed class OpenRgbClient : IDisposable, IOpenRgbClient
 {
+    private readonly object _syncRoot = new object();
     private const int MaxProtocolNumber = 4;
     private string _name;
     private readonly string _ip;
@@ -72,24 +73,28 @@ public sealed class OpenRgbClient : IDisposable, IOpenRgbClient
     }
 
     /// <inheritdoc />
-    public void SetClientName(string NewName)
+    public void SetClientName(string newName)
     {
-        if (string.IsNullOrEmpty(NewName))
-            throw new ArgumentException("Client name cannot be null or empty", nameof(NewName));
+        if (string.IsNullOrEmpty(newName))
+            throw new ArgumentException("Client name cannot be null or empty", nameof(newName));
 
-        bool wasConnected = Connected;
-
-        if (wasConnected)
+        lock (_syncRoot)
         {
-            _connection.Dispose();
+            bool wasConnected = Connected;
 
+            if (wasConnected)
+            {
+                _connection.Dispose();
+            }
+
+            _name = newName;
             _connection = CreateNewConnection();
+
+            if (wasConnected)
+            {
+               Connect();
+            }
         }
-
-        _name = NewName;
-
-        if (wasConnected)
-            Connect();
     }
 
     /// <inheritdoc />

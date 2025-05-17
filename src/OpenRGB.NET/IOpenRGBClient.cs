@@ -47,8 +47,8 @@ public interface IOpenRgbClient
     /// <summary>
     ///     Sets a new client name and reconnects if already connected.
     /// </summary>
-    /// <param name="NewName">The new name to identify this client to the OpenRGB server</param>
-    void SetClientName(string NewName);
+    /// <param name="newName">The new name to identify this client to the OpenRGB server</param>
+    void SetClientName(string newName);
 
     /// <summary>
     ///     Requests the controller count from the server.
